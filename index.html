@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Target 1900 対策クイズ</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:15px;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Hiragino Kaku Gothic ProN",
+        Meiryo,
+        sans-serif;
+    background:#eef3ff;
+    color:#222;
+}
+
+.container{
+    max-width:850px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.12);
+}
+
+h1{
+    text-align:center;
+    color:#304ffe;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+    margin-bottom:30px;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+button{
+    border:none;
+    border-radius:12px;
+    padding:16px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.mode{
+    background:#e4eaff;
+    font-weight:bold;
+}
+
+.mode:hover{
+    background:#cdd8ff;
+}
+
+.hidden{
+    display:none !important;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.questionNo{
+    color:#304ffe;
+    font-weight:bold;
+}
+
+.question{
+    background:#f5f7ff;
+    border-radius:15px;
+    padding:20px;
+    font-size:19px;
+    line-height:1.8;
+    margin-bottom:20px;
+}
+
+/* ===== 日本語訳 ===== */
+
+.japanese{
+    margin-top:12px;
+    padding:14px 18px;
+    background:#f5f5f5;
+    border-radius:12px;
+    color:#555;
+    font-size:16px;
+    line-height:1.7;
+}
+
+.choices{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.choice{
+    background:#edf1ff;
+    text-align:left;
+    min-height:60px;
+}
+
+.choice:hover{
+    background:#dce4ff;
+}
+
+.choice:disabled{
+    opacity:1;
+    cursor:default;
+}
+
+.tools{
+    margin-top:15px;
+}
+
+.hintButton{
+    width:100%;
+    background:#fff1b8;
+}
+
+.hint{
+    background:#fff8df;
+    padding:15px;
+    border-radius:12px;
+    margin:15px 0;
+    line-height:1.7;
+}
+
+.result{
+    margin-top:20px;
+    padding:18px;
+    border-radius:15px;
+    background:#f4f6fa;
+    line-height:1.8;
+}
+
+.next{
+    width:100%;
+    margin-top:15px;
+    background:#304ffe;
+    color:white;
+    font-weight:bold;
+}
+
+.back{
+    width:100%;
+    margin-top:10px;
+    background:#eeeeee;
+}
+
+@media(max-width:600px){
+
+    .container{
+        padding:17px;
+    }
+
+    .choices{
+        grid-template-columns:1fr;
+    }
+
+    .question{
+        font-size:17px;
+    }
+
+    .japanese{
+        font-size:15px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- =========================
+     メニュー
+========================= -->
+
+<div id="menu">
+
+<h1>Target 1900<br>対策クイズ</h1>
+
+<div class="subtitle">
+英語コミュニケーションⅡ<br>
+2学期中間考査対策
+</div>
+
+<div class="menu">
+
+<button class="mode" id="mode1">
+① 1枚目の問題
+</button>
+
+<button class="mode" id="mode2">
+② 2枚目の問題
+</button>
+
+<button class="mode" id="mode3">
+③ 2枚全部・全問題
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     ゲーム画面
+========================= -->
+
+<div id="game" class="hidden">
+
+<div class="top">
+
+<div id="questionNumber" class="questionNo">
+</div>
+
+<div>
+スコア：
+<span id="score">0</span>
+</div>
+
+</div>
+
+
+<div id="question" class="question">
+</div>
+
+
+<button id="hintButton" class="hintButton">
+💡 ヒントを見る
+</button>
+
+
+<div id="hint" class="hint hidden">
+</div>
+
+
+<div id="choices" class="choices">
+</div>
+
+
+<div id="result" class="result hidden">
+</div>
+
+
+<button id="nextButton" class="next">
+次の問題 ▶
+</button>
+
+
+<button id="backButton" class="back">
+メニューに戻る
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ========================================
+   問題データ
+======================================== */
+
+const questions = [
+
+/* ===== 1枚目 ===== */
+
+{
+page:1,
+no:6,
+question:"Jane's work (　　　　　) typing letters and making appointments.",
+jp:"ジェーンの仕事は手紙をタイプしたり、予約を取ったりすることを含む。",
+answer:"include",
+explanation:"include は「〜を含む」という意味。"
+},
+
+{
+page:1,
+no:7,
+question:"She (　　　　　) herself to be lucky.",
+jp:"彼女は自分自身を幸運だと見なしている。",
+answer:"consider",
+explanation:"consider A to be B で「AをBだと見なす」という意味。"
+},
+
+{
+page:1,
+no:13,
+question:"The Road Traffic Law (　　　　　) you to wear a seat belt.",
+jp:"道路交通法はあなたにシートベルトを着用することを要求する。",
+answer:"require",
+explanation:"require A to do で「Aに〜することを要求する」。"
+},
+
+{
+page:1,
+no:17,
+question:"We are (　　　　　) about the negative effect of the new tax law.",
+jp:"私たちは新しい税法のマイナス効果を心配している。",
+answer:"concern",
+explanation:"be concerned about で「〜を心配している」。"
+},
+
+{
+page:1,
+no:19,
+question:"In Japan, more and more men are (　　　　　) in raising children.",
+jp:"日本では、ますます多くの男性が子育てにかかわっている。",
+answer:"involve",
+explanation:"be involved in で「〜に関わっている」。"
+},
+
+{
+page:1,
+no:25,
+question:"Your language can (　　　　　) your way of thinking.",
+jp:"あなたの（使う）言語はあなたの考え方に影響を及ぼす可能性がある。",
+answer:"affect",
+explanation:"affect は動詞で「〜に影響を及ぼす」。"
+},
+
+{
+page:1,
+no:26,
+question:"Our team (　　　　　) with complaints from our customers.",
+jp:"我がチームは顧客からの苦情を処理する。",
+answer:"deal (with)",
+explanation:"deal with で「〜を処理する、〜に対処する」。"
+},
+
+{
+page:1,
+no:29,
+question:"She (　　　　　) that she was put in a difficult position.",
+jp:"彼女は自分が難しい立場に置かれていることに気づいた。",
+answer:"realize",
+explanation:"realize は「〜に気づく」という意味。"
+},
+
+{
+page:1,
+no:31,
+question:"She (　　　　　) the Japanese economy with the U.S. economy.",
+jp:"彼女は日本経済をアメリカ経済と比較した。",
+answer:"compare A with B",
+explanation:"compare A with B で「AをBと比較する」。"
+},
+
+{
+page:1,
+no:37,
+question:"Her parents (　　　　　) to her marriage.",
+jp:"彼女の両親は彼女の結婚に反対した。",
+answer:"object (to)",
+explanation:"object to で「〜に反対する」。"
+},
+
+{
+page:1,
+no:60,
+question:"The manager decided to put his new ideas into (　　　　　).",
+jp:"部長は自分の新しい考えを実行することに決めた。",
+answer:"practice",
+explanation:"put A into practice で「Aを実行する」。"
+},
+
+{
+page:1,
+no:82,
+question:"A group is not just a collection of (　　　　　) talents.",
+jp:"集団は単なる個々の才能の集まりではない。",
+answer:"individual",
+explanation:"individual は「個々の、一人ひとりの」という意味。"
+},
+
+{
+page:1,
+no:93,
+question:"Tickets for the concert are (　　　　　) on the Internet.",
+jp:"そのコンサートのチケットはインターネットで入手可能だ。",
+answer:"available",
+explanation:"be available で「利用できる、入手できる」。"
+},
+
+{
+page:1,
+no:96,
+question:"The train is (　　　　　) to arrive at Nagoya Station in ten minutes.",
+jp:"列車は10分後に名古屋駅に到着する予定である。",
+answer:"due",
+explanation:"be due to do で「〜する予定である」。"
+},
+
+{
+page:1,
+no:98,
+question:"The Olympic Games originated in (　　　　　) times in Greece.",
+jp:"オリンピックは古代のギリシャで始まった。",
+answer:"ancient",
+explanation:"ancient は「古代の」という意味。"
+},
+
+{
+page:1,
+no:102,
+question:"The article (　　　　　) to Darwin's theory of evolution.",
+jp:"その記事はダーウィンの進化論に言及している。",
+answer:"refer (to)",
+explanation:"refer to で「〜に言及する」。"
+},
+
+{
+page:1,
+no:106,
+question:"She immediately (　　　　　) the building in the photo.",
+jp:"彼女はすぐに、その写真に写っている建物を認識した。",
+answer:"recognize",
+explanation:"recognize は「認識する、見分ける」という意味。"
+},
+
+{
+page:1,
+no:108,
+question:"Forest fires often (　　　　　) in California.",
+jp:"カリフォルニア州では森林火災がよく起こる。",
+answer:"occur",
+explanation:"occur は「起こる、発生する」。"
+},
+
+{
+page:1,
+no:118,
+question:"You can (　　　　　) your goals by making a good plan.",
+jp:"よい計画を立てることによって、自分の目標を達成することができる。",
+answer:"achieve",
+explanation:"achieve は「目標などを達成する」。"
+},
+
+{
+page:1,
+no:119,
+question:"At a party, you can (　　　　　) friendly relationships with others.",
+jp:"パーティーではほかの人々と友好的な関係を確立することができる。",
+answer:"establish",
+explanation:"establish は「確立する、築く」。"
+},
+
+{
+page:1,
+no:121,
+question:"I (　　　　　) that his writing shows his true love of nature.",
+jp:"私は彼の書くものは彼の自然に対する真の愛を表していると思う。",
+answer:"suppose",
+explanation:"suppose は「〜だと思う、仮定する」。"
+},
+
+{
+page:1,
+no:124,
+question:"It takes time to (　　　　　) whether something is true or not.",
+jp:"何かが真実かどうかを決定するには時間がかかる。",
+answer:"determine",
+explanation:"determine は「決定する、判断する」。"
+},
+
+{
+page:1,
+no:126,
+question:"Scientists have (　　　　　) that dinosaurs once existed.",
+jp:"科学者はかつて恐竜が存在したことを証明した。",
+answer:"prove",
+explanation:"prove は「証明する」。have + 過去分詞なので proved になる。"
+},
+
+{
+page:1,
+no:132,
+question:"Today, many people (　　　　　) English language ability as necessary.",
+jp:"今日、多くの人々は英語の能力を必要なものだと見なしている。",
+answer:"regard A as B",
+explanation:"regard A as B で「AをBと見なす」。"
+},
+
+{
+page:1,
+no:137,
+question:"Strict laws may (　　　　　) people from committing violent crimes.",
+jp:"厳しい法律は人々が凶悪犯罪を犯すのを妨げるかもしれない。",
+answer:"prevent (A) from ~ing",
+explanation:"prevent A from ~ing で「Aが〜するのを妨げる」。"
+},
+
+
+/* ===== 2枚目 ===== */
+
+{
+page:2,
+no:138,
+question:"Many countries around the world (　　　　　) from natural disasters.",
+jp:"世界中の多くの国が自然災害に苦しんでいる。",
+answer:"suffer (from)",
+explanation:"suffer from で「〜に苦しむ」。"
+},
+
+{
+page:2,
+no:155,
+question:"The country has had fast growth over the last few (　　　　　).",
+jp:"その国は過去数十年間にわたって急成長を遂げてきた。",
+answer:"decade",
+explanation:"decade は「10年間」。"
+},
+
+{
+page:2,
+no:162,
+question:"Some (　　　　　) of dieting face a lot of criticism.",
+jp:"いくつかのダイエット法は多くの批判に直面している。",
+answer:"method",
+explanation:"method は「方法」。"
+},
+
+{
+page:2,
+no:163,
+question:"Technology will make the efficient use of natural (　　　　　) possible.",
+jp:"科学技術は天然資源の効率的な利用を可能にするだろう。",
+answer:"resource",
+explanation:"resource は「資源」。natural resources で「天然資源」。"
+},
+
+{
+page:2,
+no:164,
+question:"Auroras are visible in the polar (　　　　　).",
+jp:"オーロラは極地で見られる。",
+answer:"region",
+explanation:"region は「地域、地方」。"
+},
+
+{
+page:2,
+no:165,
+question:"The doctors tried out a new kind of (　　　　　) on the girl to save her life.",
+jp:"医師たちはその少女の命を救うために新しい種類の薬を試した。",
+answer:"medicine",
+explanation:"medicine は「薬、医薬品」。"
+},
+
+{
+page:2,
+no:191,
+question:"Organic food is said to be healthy, so it is (　　　　　) buying.",
+jp:"自然食品は健康によいと言われていて、だから買う価値がある。",
+answer:"be worth ~ing",
+explanation:"be worth ~ing で「〜する価値がある」。"
+},
+
+{
+page:2,
+no:192,
+question:"It is important in business to look for (　　　　　) customers.",
+jp:"潜在的な顧客を探すことがビジネスにおいて重要だ。",
+answer:"potential",
+explanation:"potential は「潜在的な、可能性のある」。"
+},
+
+{
+page:2,
+no:201,
+question:"The police officer (　　　　　) the man as a criminal.",
+jp:"警官はその男性を犯人と特定した。",
+answer:"identify A as B",
+explanation:"identify A as B で「AをBだと特定する」。"
+},
+
+{
+page:2,
+no:203,
+question:"The cave paintings (　　　　　) that early humans had the idea of time.",
+jp:"その洞窟絵画は原始人が時間の概念を持っていたことを示している。",
+answer:"indicate",
+explanation:"indicate は「示す」。"
+},
+
+{
+page:2,
+no:211,
+question:"Most people (　　　　　) a lack of sleep with common health problems.",
+jp:"たいていの人は睡眠不足をよくある健康問題と結び付ける。",
+answer:"associate A with B",
+explanation:"associate A with B で「AをBと結び付ける」。"
+},
+
+{
+page:2,
+no:213,
+question:"Lively discussions may help (　　　　　) better understanding among people.",
+jp:"活発な議論は人々の間のさらなる理解を促進する助けとなるかもしれない。",
+answer:"promote",
+explanation:"promote は「促進する」。"
+},
+
+{
+page:2,
+no:214,
+question:"She (　　　　　) enough money to pay for her costs of living.",
+jp:"彼女は生活費をまかなうのに十分なお金を稼ぐ。",
+answer:"earn",
+explanation:"earn は「お金を稼ぐ」。"
+},
+
+{
+page:2,
+no:220,
+question:"We (　　　　　) our arrival to be 20 minutes late.",
+jp:"私たちは到着が20分遅れると推定した。",
+answer:"estimate",
+explanation:"estimate A to be B で「AをBだと推定する」。"
+},
+
+{
+page:2,
+no:224,
+question:"The sailors (　　　　　) the warning about the dangerous currents in the sea.",
+jp:"船員たちは危険な潮流の警告を無視した。",
+answer:"ignore",
+explanation:"ignore は「無視する」。"
+},
+
+{
+page:2,
+no:228,
+question:"Carbon dioxide (　　　　　) to global climate change.",
+jp:"二酸化炭素は地球の気候変動の一因となる。",
+answer:"contribute (to)",
+explanation:"contribute to で「〜の一因となる」。"
+},
+
+{
+page:2,
+no:238,
+question:"The hotel's high level of service always (　　　　　) its guests.",
+jp:"そのホテルの高い水準のサービスはいつも客たちを満足させる。",
+answer:"satisfy",
+explanation:"satisfy は「人を満足させる」。"
+},
+
+{
+page:2,
+no:262,
+question:"Women's (　　　　　) for equal rights is still an important issue today.",
+jp:"女性たちの平等の権利を求める闘いは今日でも重要な問題である。",
+answer:"struggle",
+explanation:"struggle は「苦闘、闘い」。"
+},
+
+{
+page:2,
+no:266,
+question:"Tokyo somehow survived serious air (　　　　　) in the 1960s.",
+jp:"東京は1960年代の深刻な大気汚染をなんとか乗り越えた。",
+answer:"pollution",
+explanation:"pollution は「汚染」。air pollution で「大気汚染」。"
+},
+
+{
+page:2,
+no:273,
+question:"The (　　　　　) of the meeting is to make a budget for next year.",
+jp:"その会議の目的は翌年の予算を立てることである。",
+answer:"aim",
+explanation:"aim は「目的、目標」。"
+},
+
+{
+page:2,
+no:278,
+question:"Medicine has made significant (　　　　　) in treating serious diseases.",
+jp:"医学は重病の治療において重要な進歩を遂げてきている。",
+answer:"progress",
+explanation:"make progress で「進歩する」。"
+},
+
+{
+page:2,
+no:280,
+question:"The beachside is an (　　　　　) place for a daily walk.",
+jp:"浜辺は毎日の散歩にとって理想的な場所である。",
+answer:"ideal",
+explanation:"ideal は「理想的な」。"
+},
+
+{
+page:2,
+no:281,
+question:"It is important to know the most (　　　　　) ways of studying.",
+jp:"最も効率的な学習法を知ることは重要である。",
+answer:"efficient",
+explanation:"efficient は「効率的な」。"
+},
+
+{
+page:2,
+no:286,
+question:"Taxi drivers are generally (　　　　　) with local roads.",
+jp:"タクシーの運転手はたいてい地元の道路に精通している。",
+answer:"be familiar with",
+explanation:"be familiar with で「〜に精通している」。"
+},
+
+{
+page:2,
+no:295,
+question:"Children should be (　　　　　) of their parents after a certain age.",
+jp:"子供はある年齢以降は親から独立しているべきである。",
+answer:"be independent of",
+explanation:"be independent of で「〜から独立している」。"
+}
+
+];
+
+
+/* ========================================
+   ゲーム用変数
+======================================== */
+
+let currentList = [];
+
+let currentQuestion = null;
+
+let score = 0;
+
+let answered = false;
+
+
+/* ========================================
+   シャッフル
+======================================== */
+
+function shuffle(array){
+
+    let result = array.slice();
+
+    for(let i=result.length-1;i>0;i--){
+
+        let j=Math.floor(Math.random()*(i+1));
+
+        let temp=result[i];
+
+        result[i]=result[j];
+
+        result[j]=temp;
+    }
+
+    return result;
+}
+
+
+/* ========================================
+   モード開始
+======================================== */
+
+function startGame(mode){
+
+    if(mode === 1){
+
+        currentList =
+            questions.filter(function(q){
+                return q.page === 1;
+            });
+
+    }
+
+    else if(mode === 2){
+
+        currentList =
+            questions.filter(function(q){
+                return q.page === 2;
+            });
+
+    }
+
+    else{
+
+        currentList =
+            questions.slice();
+
+    }
+
+
+    score=0;
+
+    document.getElementById("score").textContent=score;
+
+    document.getElementById("menu").classList.add("hidden");
+
+    document.getElementById("game").classList.remove("hidden");
+
+    showQuestion();
+}
+
+
+/* ========================================
+   問題表示
+======================================== */
+
+function showQuestion(){
+
+    answered=false;
+
+    currentQuestion =
+        currentList[
+            Math.floor(
+                Math.random()*currentList.length
+            )
+        ];
+
+
+    document.getElementById("questionNumber").textContent =
+        "Target 1900 No."+currentQuestion.no;
+
+
+    /* ★ 英文＋日本語訳を表示 */
+
+    document.getElementById("question").innerHTML =
+        currentQuestion.question
+        +
+        '<div class="japanese">'
+        +
+        currentQuestion.jp
+        +
+        '</div>';
+
+
+    document.getElementById("hint").classList.add("hidden");
+
+    document.getElementById("hint").textContent="";
+
+
+    document.getElementById("result").classList.add("hidden");
+
+    document.getElementById("result").innerHTML="";
+
+
+    /*
+       6択を作る
+    */
+
+    let otherAnswers =
+        questions
+        .map(function(q){
+            return q.answer;
+        })
+        .filter(function(answer){
+            return answer !== currentQuestion.answer;
+        });
+
+
+    otherAnswers =
+        [...new Set(otherAnswers)];
+
+
+    otherAnswers =
+        shuffle(otherAnswers).slice(0,5);
+
+
+    let choices =
+        shuffle(
+            [currentQuestion.answer]
+            .concat(otherAnswers)
+        );
+
+
+    let choiceBox =
+        document.getElementById("choices");
+
+
+    choiceBox.innerHTML="";
+
+
+    choices.forEach(function(choice,index){
+
+        let button =
+            document.createElement("button");
+
+
+        button.className="choice";
+
+
+        button.textContent =
+            ["①","②","③","④","⑤","⑥"][index]
+            +" "+choice;
+
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                checkAnswer(
+                    choice,
+                    button
+                );
+
+            }
+        );
+
+
+        choiceBox.appendChild(button);
+
+    });
+
+}
+
+
+/* ========================================
+   答え確認
+======================================== */
+
+function checkAnswer(choice,button){
+
+    if(answered){
+        return;
+    }
+
+
+    answered=true;
+
+
+    let buttons =
+        document.querySelectorAll(".choice");
+
+
+    buttons.forEach(function(btn){
+
+        btn.disabled=true;
+
+    });
+
+
+    let result =
+        document.getElementById("result");
+
+
+    if(choice === currentQuestion.answer){
+
+        score++;
+
+        document.getElementById("score").textContent=score;
+
+
+        result.innerHTML =
+            "⭕ <strong>正解！！</strong><br><br>"
+            +
+            "<strong>【解説】</strong><br>"
+            +
+            currentQuestion.explanation;
+
+    }
+
+    else{
+
+        result.innerHTML =
+            "❌ <strong>不正解！</strong><br><br>"
+            +
+            "正解は <strong>"
+            +
+            currentQuestion.answer
+            +
+            "</strong><br><br>"
+            +
+            "<strong>【解説】</strong><br>"
+            +
+            currentQuestion.explanation;
+
+    }
+
+
+    result.classList.remove("hidden");
+
+}
+
+
+/* ========================================
+   ヒント
+======================================== */
+
+function showHint(){
+
+    if(!currentQuestion){
+        return;
+    }
+
+
+    let hint =
+        document.getElementById("hint");
+
+
+    hint.innerHTML =
+        "<strong>💡 日本語訳</strong><br>"
+        +
+        currentQuestion.jp;
+
+
+    hint.classList.remove("hidden");
+
+}
+
+
+/* ========================================
+   次の問題
+======================================== */
+
+function nextQuestion(){
+
+    showQuestion();
+
+}
+
+
+/* ========================================
+   メニューへ戻る
+======================================== */
+
+function backToMenu(){
+
+    document.getElementById("game").classList.add("hidden");
+
+    document.getElementById("menu").classList.remove("hidden");
+
+}
+
+
+/* ========================================
+   ★ ボタン設定
+======================================== */
+
+document
+.getElementById("mode1")
+.addEventListener(
+    "click",
+    function(){
+
+        startGame(1);
+
+    }
+);
+
+
+document
+.getElementById("mode2")
+.addEventListener(
+    "click",
+    function(){
+
+        startGame(2);
+
+    }
+);
+
+
+document
+.getElementById("mode3")
+.addEventListener(
+    "click",
+    function(){
+
+        startGame(3);
+
+    }
+);
+
+
+document
+.getElementById("hintButton")
+.addEventListener(
+    "click",
+    showHint
+);
+
+
+document
+.getElementById("nextButton")
+.addEventListener(
+    "click",
+    nextQuestion
+);
+
+
+document
+.getElementById("backButton")
+.addEventListener(
+    "click",
+    backToMenu
+);
+
+</script>
+
+</body>
+</html>
